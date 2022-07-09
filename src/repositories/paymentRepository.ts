@@ -1,7 +1,5 @@
 import { connection } from "../config/database.js";
 
-import { Payment } from "../interfaces/paymentInterface.js";
-
 import {
 	PaymentWithBusinessName,
 	PaymentInsertData,
