@@ -1,4 +1,4 @@
-CREATE TYPE "transactionType" AS ENUM ('groceries', 'restaurant', 'transport', 'education', 'health');
+CREATE TYPE "transactionType" AS ENUM ('groceries', 'restaurants', 'transport', 'education', 'health');
 
 CREATE TABLE "companies"(
     "id" SERIAL NOT NULL PRIMARY KEY,
