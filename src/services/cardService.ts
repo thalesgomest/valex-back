@@ -24,6 +24,7 @@ export const createCard = async (
 			"Ensure to provide the correct employee ID"
 		);
 	}
+	await validateUniqueCardByTypeAndEmployee(type, employeeId);
 };
 
 const validateAPIKeyCompany = async (apiKey: string) => {
@@ -50,4 +51,22 @@ const validateEmployee = async (employeeId: number) => {
 		);
 	}
 	return result;
+};
+
+const validateUniqueCardByTypeAndEmployee = async (
+	type: TransactionTypes,
+	employeeId: number
+) => {
+	const result = await cardRepository.findByTypeAndEmployeeId(
+		type,
+		employeeId
+	);
+	if (result) {
+		throw new AppError(
+			"Card already exists",
+			409,
+			"Card already exists for this employee",
+			"Ensure to provide a unique card type"
+		);
+	}
 };
