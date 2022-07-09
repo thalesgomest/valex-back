@@ -1,29 +1,10 @@
 import { connection } from "../config/database.js";
 import { mapObjectToUpdateQuery } from "../utils/sqlUtils.js";
 
-export type TransactionTypes =
-	| "groceries"
-	| "restaurant"
-	| "transport"
-	| "education"
-	| "health";
+import { TransactionTypes } from "../types/transactionTypes.js";
+import { Card } from "../interfaces/cardInterface.js";
 
-export interface Card {
-	id: number;
-	employeeId: number;
-	number: string;
-	cardholderName: string;
-	securityCode: string;
-	expirationDate: string;
-	password?: string;
-	isVirtual: boolean;
-	originalCardId?: number;
-	isBlocked: boolean;
-	type: TransactionTypes;
-}
-
-export type CardInsertData = Omit<Card, "id">;
-export type CardUpdateData = Partial<Card>;
+import { CardInsertData, CardUpdateData } from "../types/cardTypes.js";
 
 export async function find() {
 	const result = await connection.query<Card>("SELECT * FROM cards");

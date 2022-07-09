@@ -12,6 +12,9 @@ app.use(cors());
 app.use(json());
 app.use(router);
 app.use(errorHandler);
+app.get("/", (req, res) => {
+	res.send("Hello World!");
+});
 
 const port = +process.env.PORT || 4000;
 app.listen(port, () => {

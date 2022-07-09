@@ -1,11 +1,5 @@
 import { connection } from "../config/database.js";
-import { TransactionTypes } from "./cardRepository.js";
-
-export interface Business {
-	id: number;
-	name: string;
-	type: TransactionTypes;
-}
+import { Business } from "../interfaces/bussinessInterface.js";
 
 export async function findById(id: number) {
 	const result = await connection.query<Business, [number]>(

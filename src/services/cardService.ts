@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 
-import { TransactionTypes } from "../repositories/cardRepository.js";
+import { TransactionTypes } from "../types/transactionTypes.js";
 import * as cardRepository from "../repositories/cardRepository.js";
 import * as companyRepository from "../repositories/companyRepository.js";
 
-import { Company } from "../repositories/companyRepository.js";
+import { Company } from "../interfaces/companyInterface.js";
 
 import AppError from "../config/error.js";
 

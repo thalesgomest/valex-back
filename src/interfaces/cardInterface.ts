@@ -1,7 +1,7 @@
-import { TransactionTypes } from "../repositories/cardRepository";
+import { TransactionTypes } from "../types/transactionTypes.js";
 
-interface Card {
-	id?: number;
+export interface Card {
+	id: number;
 	employeeId: number;
 	number: string;
 	cardholderName: string;
@@ -13,5 +13,3 @@ interface Card {
 	isBlocked: boolean;
 	type: TransactionTypes;
 }
-
-export default Card;
