@@ -14,7 +14,6 @@ export const createCard = async (req: Request, res: Response) => {
 
 export const activateCard = async (req: Request, res: Response) => {
 	const cardId = Number(req.params.cardId);
-	console.log(cardId);
 	if (!cardId) {
 		throw new AppError(
 			"Card ID is required with route parameter: card/cardId/activate",

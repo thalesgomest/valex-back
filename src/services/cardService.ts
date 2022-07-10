@@ -5,10 +5,13 @@ import * as companyRepository from "../repositories/companyRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
 
 import { TransactionTypes } from "../types/transactionTypes.js";
-import { CardInsertData } from "../types/cardTypes.js";
+import { CardInsertData, CardUpdateData } from "../types/cardTypes.js";
 
-import { getCardExperationDate } from "../utils/cardDateFormatter.js";
-import { encryptData } from "../utils/encryptData.js";
+import {
+	getCardExperationDate,
+	compareDates,
+} from "../utils/cardDateFormatter.js";
+import { encryptData, decryptData } from "../utils/encryptData.js";
 
 import AppError from "../config/error.js";
 
@@ -36,7 +39,14 @@ export const activateCard = async (
 	cardId: number,
 	securityCode: string,
 	password: string
-) => {};
+) => {
+	await validateCardForActivation(cardId, securityCode);
+	const cardDataUpdate: CardUpdateData = {
+		isBlocked: false,
+		password: encryptData(password),
+	};
+	await cardRepository.update(cardId, cardDataUpdate);
+};
 
 const validateAPIKeyCompany = async (apiKey: string) => {
 	const result = await companyRepository.findByApiKey(apiKey);
@@ -141,7 +151,7 @@ const generateCardData = (
 	};
 };
 
-const validateCardId = async (cardId: number) => {
+const validateCardIdIsRegistered = async (cardId: number) => {
 	const result = await cardRepository.findById(cardId);
 	if (!result) {
 		throw new AppError(
@@ -154,6 +164,44 @@ const validateCardId = async (cardId: number) => {
 	return result;
 };
 
-// const validateCardForActivation = (cardId: number, securityCode: string) => {
+const validateCardExpirationDate = async (expirationDate: string) => {
+	if (compareDates(new Date(), expirationDate) === "after") {
+		throw new AppError(
+			"Card expired",
+			409,
+			"This card has expired",
+			"Ensure to provide a valid card ID"
+		);
+	}
+};
 
-// }
+const validateCardSecurityCode = async (
+	encryptedSecurityCode: string,
+	cvv: string
+) => {
+	const descryptedSecurityCode = decryptData(encryptedSecurityCode);
+	// FIXME: checkconsole.log(descryptedSecurityCode);
+	if (descryptedSecurityCode !== cvv) {
+		throw new AppError(
+			"Invalid security code",
+			409,
+			"Invalid security code",
+			"Ensure to provide a correct security code"
+		);
+	}
+};
+
+const validateCardForActivation = async (cardId: number, cvv: string) => {
+	const { expirationDate, securityCode, password } =
+		await validateCardIdIsRegistered(cardId);
+	await validateCardExpirationDate(expirationDate);
+	if (password) {
+		throw new AppError(
+			"Card already activated",
+			409,
+			"This card is already activated",
+			"Ensure to provide a valid card ID"
+		);
+	}
+	await validateCardSecurityCode(securityCode, cvv);
+};
