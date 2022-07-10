@@ -32,6 +32,12 @@ export const createCard = async (
 	await cardRepository.insert(cardData);
 };
 
+export const activateCard = async (
+	cardId: number,
+	securityCode: string,
+	password: string
+) => {};
+
 const validateAPIKeyCompany = async (apiKey: string) => {
 	const result = await companyRepository.findByApiKey(apiKey);
 	if (!result) {
@@ -84,6 +90,11 @@ const createCardSecurityCode = () => {
 	return faker.finance.creditCardCVV();
 };
 
+const createCardExpirationDate = () => {
+	const EXPIRATION_CARD_DATE_YEARS = 5;
+	return getCardExperationDate(new Date(), EXPIRATION_CARD_DATE_YEARS);
+};
+
 const employeeNameFormatter = (fullName: string) => {
 	const regex = /^(d[a,e,o,i])$/;
 	const names = fullName.split(" ");
@@ -109,11 +120,6 @@ const employeeNameFormatter = (fullName: string) => {
 	return formattedName.toUpperCase();
 };
 
-const createCardExpirationDate = () => {
-	const EXPIRATION_CARD_DATE_YEARS = 5;
-	return getCardExperationDate(new Date(), EXPIRATION_CARD_DATE_YEARS);
-};
-
 const generateCardData = (
 	employeeId: number,
 	fullName: string,
@@ -134,3 +140,20 @@ const generateCardData = (
 		type,
 	};
 };
+
+const validateCardId = async (cardId: number) => {
+	const result = await cardRepository.findById(cardId);
+	if (!result) {
+		throw new AppError(
+			"Card not found",
+			404,
+			"Card not found with ID",
+			"Ensure to provide the correct ID"
+		);
+	}
+	return result;
+};
+
+// const validateCardForActivation = (cardId: number, securityCode: string) => {
+
+// }
