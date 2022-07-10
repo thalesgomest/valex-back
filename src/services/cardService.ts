@@ -1,11 +1,14 @@
-import { Request, Response } from "express";
+import { faker } from "@faker-js/faker";
 
 import * as cardRepository from "../repositories/cardRepository.js";
 import * as companyRepository from "../repositories/companyRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
 
 import { TransactionTypes } from "../types/transactionTypes.js";
-import { Company } from "../interfaces/companyInterface.js";
+import { CardInsertData } from "../types/cardTypes.js";
+
+import { getCardExperationDate } from "../utils/cardDateFormatter.js";
+import { encryptData } from "../utils/encryptData.js";
 
 import AppError from "../config/error.js";
 
@@ -25,6 +28,8 @@ export const createCard = async (
 		);
 	}
 	await validateUniqueCardByTypeAndEmployee(type, employeeId);
+	const cardData = generateCardData(employeeId, fullName, type);
+	await cardRepository.insert(cardData);
 };
 
 const validateAPIKeyCompany = async (apiKey: string) => {
@@ -69,4 +74,63 @@ const validateUniqueCardByTypeAndEmployee = async (
 			"Ensure to provide a unique card type"
 		);
 	}
+};
+
+const createCardNumber = () => {
+	return faker.finance.creditCardNumber("#### #### #### #### #### ####");
+};
+
+const createCardSecurityCode = () => {
+	return faker.finance.creditCardCVV();
+};
+
+const employeeNameFormatter = (fullName: string) => {
+	const regex = /^(d[a,e,o,i])$/;
+	const names = fullName.split(" ");
+	let formattedName = "";
+
+	if (names.length === 1) {
+		formattedName = names[0];
+	} else if (names.length === 2) {
+		formattedName = `${names[0]} ${names[1]}`;
+	} else {
+		const half = Math.floor(names.length / 2);
+		const firstName = names[0];
+		const lastName = names[names.length - 1];
+		const middleName = regex.test(names[half])
+			? names[half + 1] === lastName
+				? names[half - 1]
+				: names[half + 1]
+			: names[half];
+
+		formattedName = `${firstName} ${middleName[0]} ${lastName}`;
+	}
+
+	return formattedName.toUpperCase();
+};
+
+const createCardExpirationDate = () => {
+	const EXPIRATION_CARD_DATE_YEARS = 5;
+	return getCardExperationDate(new Date(), EXPIRATION_CARD_DATE_YEARS);
+};
+
+const generateCardData = (
+	employeeId: number,
+	fullName: string,
+	type: TransactionTypes
+): CardInsertData => {
+	const cardNumber = createCardNumber();
+	const cardholderName = employeeNameFormatter(fullName);
+	const expirationDate = createCardExpirationDate();
+	const encryptedSecurityCode = encryptData(createCardSecurityCode());
+	return {
+		number: cardNumber,
+		employeeId,
+		cardholderName,
+		securityCode: encryptedSecurityCode,
+		expirationDate,
+		isVirtual: false,
+		isBlocked: false,
+		type,
+	};
 };

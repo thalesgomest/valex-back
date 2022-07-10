@@ -5,6 +5,6 @@ INSERT INTO employees ("fullName", "cpf", "email", "companyId") VALUES ('Ciclana
 INSERT INTO employees ("fullName", "cpf", "email", "companyId") VALUES ('Beltrano José da Silva', '98100935741', 'beltrano.silva@gmail.com', 2);
 INSERT INTO businesses ("name", "type") VALUES ('Responde Aí', 'education');
 INSERT INTO businesses ("name", "type") VALUES ('Extra', 'groceries');
-INSERT INTO businesses ("name", "type") VALUES ('Driven Eats', 'restaurant');
+INSERT INTO businesses ("name", "type") VALUES ('Driven Eats', 'restaurants');
 INSERT INTO businesses ("name", "type") VALUES ('Uber', 'transport');
 INSERT INTO businesses ("name", "type") VALUES ('Unimed', 'health');
