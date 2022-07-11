@@ -27,3 +27,33 @@ export const activateCard = async (req: Request, res: Response) => {
 
 	res.sendStatus(200);
 };
+
+export const blockCard = async (req: Request, res: Response) => {
+	const cardId = Number(req.params.cardId);
+	if (!cardId) {
+		throw new AppError(
+			"Card ID is required with route parameter: card/cardId/activate",
+			400,
+			"Card ID is required and must be a number",
+			"Ensure to provide the correct Card ID"
+		);
+	}
+	const { password } = res.locals.body;
+	await cardService.blockCard(cardId, password);
+	res.sendStatus(200);
+};
+
+export const unblockCard = async (req: Request, res: Response) => {
+	const cardId = Number(req.params.cardId);
+	if (!cardId) {
+		throw new AppError(
+			"Card ID is required with route parameter: card/cardId/activate",
+			400,
+			"Card ID is required and must be a number",
+			"Ensure to provide the correct Card ID"
+		);
+	}
+	const { password } = res.locals.body;
+	await cardService.unblockCard(cardId, password);
+	res.sendStatus(200);
+};

@@ -5,6 +5,7 @@ import * as companyRepository from "../repositories/companyRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
 
 import { TransactionTypes } from "../types/transactionTypes.js";
+import { CardServicesTypes } from "../types/cardServicesTypes.js";
 import { CardInsertData, CardUpdateData } from "../types/cardTypes.js";
 
 import {
@@ -44,6 +45,22 @@ export const activateCard = async (
 	const cardDataUpdate: CardUpdateData = {
 		isBlocked: false,
 		password: encryptData(password),
+	};
+	await cardRepository.update(cardId, cardDataUpdate);
+};
+
+export const blockCard = async (cardId: number, password: string) => {
+	await validateCardForBlockOrUnblock(cardId, password, "blocking");
+	const cardDataUpdate: CardUpdateData = {
+		isBlocked: true,
+	};
+	await cardRepository.update(cardId, cardDataUpdate);
+};
+
+export const unblockCard = async (cardId: number, password: string) => {
+	await validateCardForBlockOrUnblock(cardId, password, "unblocking");
+	const cardDataUpdate: CardUpdateData = {
+		isBlocked: false,
 	};
 	await cardRepository.update(cardId, cardDataUpdate);
 };
@@ -146,7 +163,7 @@ const generateCardData = (
 		securityCode: encryptedSecurityCode,
 		expirationDate,
 		isVirtual: false,
-		isBlocked: false,
+		isBlocked: true,
 		type,
 	};
 };
@@ -180,7 +197,7 @@ const validateCardSecurityCode = async (
 	cvv: string
 ) => {
 	const descryptedSecurityCode = decryptData(encryptedSecurityCode);
-	// FIXME: checkconsole.log(descryptedSecurityCode);
+	// CONSOLELOG: console.log(descryptedSecurityCode);
 	if (descryptedSecurityCode !== cvv) {
 		throw new AppError(
 			"Invalid security code",
@@ -204,4 +221,41 @@ const validateCardForActivation = async (cardId: number, cvv: string) => {
 		);
 	}
 	await validateCardSecurityCode(securityCode, cvv);
+};
+
+const validateCardForBlockOrUnblock = async (
+	cardId: number,
+	password: string,
+	cardService: CardServicesTypes
+) => {
+	const {
+		expirationDate,
+		isBlocked,
+		password: registeredCardPassword,
+	} = await validateCardIdIsRegistered(cardId);
+	await validateCardExpirationDate(expirationDate);
+	if (cardService === "blocking" && isBlocked) {
+		throw new AppError(
+			"Card already blocked",
+			409,
+			"This card is already blocked",
+			"Ensure to provide a valid card ID"
+		);
+	}
+	if (cardService === "unblocking" && !isBlocked) {
+		throw new AppError(
+			"Card already unblocked",
+			409,
+			"This card is already unblocked",
+			"Ensure to provide a valid card ID"
+		);
+	}
+	if (password !== decryptData(registeredCardPassword)) {
+		throw new AppError(
+			"Invalid password",
+			409,
+			"Invalid password",
+			"Ensure to provide a correct password"
+		);
+	}
 };

@@ -4,6 +4,7 @@ import headerMiddleware from "../middlewares/headerMiddleware.js";
 import validateSchemaMiddleware from "../middlewares/validateSchemaMiddleware.js";
 import cardRequestSchema from "../schemas/cardRequestSchema.js";
 import activationCardSchema from "../schemas/activationCardSchema.js";
+import blockAndCardSchema from "../schemas/blockAndUnblockCardSchema.js";
 
 const cardRouter = Router();
 
@@ -24,6 +25,18 @@ cardRouter.put(
 		`${endpoint}/:cardId/activate`
 	),
 	cardController.activateCard
+);
+
+cardRouter.put(
+	"/:cardId/block",
+	validateSchemaMiddleware(blockAndCardSchema, `${endpoint}/:cardId/block`),
+	cardController.blockCard
+);
+
+cardRouter.put(
+	"/:cardId/unblock",
+	validateSchemaMiddleware(blockAndCardSchema, `${endpoint}/:cardId/unblock`),
+	cardController.unblockCard
 );
 
 export default cardRouter;
