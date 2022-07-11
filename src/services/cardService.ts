@@ -40,11 +40,18 @@ export const createCard = async (
 };
 
 export const activateCard = async (
-	cardId: number,
+	number: string,
+	cardholderName: string,
+	expirationDate: string,
 	securityCode: string,
 	password: string
 ) => {
-	await validationService.validateCardForActivation(cardId, securityCode);
+	const { cardId } = await validationService.validateCardForActivation(
+		number,
+		cardholderName,
+		expirationDate,
+		securityCode
+	);
 	const cardDataUpdate: CardUpdateData = {
 		isBlocked: false,
 		password: encryptData(password),
@@ -52,9 +59,16 @@ export const activateCard = async (
 	await cardRepository.update(cardId, cardDataUpdate);
 };
 
-export const blockCard = async (cardId: number, password: string) => {
-	await validationService.validateCardForBlockOrUnblock(
-		cardId,
+export const blockCard = async (
+	number: string,
+	cardholderName: string,
+	expirationDate: string,
+	password: string
+) => {
+	const { cardId } = await validationService.validateCardForBlockOrUnblock(
+		number,
+		cardholderName,
+		expirationDate,
 		password,
 		"blocking"
 	);
@@ -64,9 +78,16 @@ export const blockCard = async (cardId: number, password: string) => {
 	await cardRepository.update(cardId, cardDataUpdate);
 };
 
-export const unblockCard = async (cardId: number, password: string) => {
-	await validationService.validateCardForBlockOrUnblock(
-		cardId,
+export const unblockCard = async (
+	number: string,
+	cardholderName: string,
+	expirationDate: string,
+	password: string
+) => {
+	const { cardId } = await validationService.validateCardForBlockOrUnblock(
+		number,
+		cardholderName,
+		expirationDate,
 		password,
 		"unblocking"
 	);
@@ -76,8 +97,16 @@ export const unblockCard = async (cardId: number, password: string) => {
 	await cardRepository.update(cardId, cardDataUpdate);
 };
 
-export const getStatementCard = async (cardId: number) => {
-	const { id } = await validationService.validateCardIdIsRegistered(cardId);
+export const getStatementCard = async (
+	number: string,
+	cardholderName: string,
+	expirationDate: string
+) => {
+	const { id } = await validationService.validateCardIsRegistered(
+		number,
+		cardholderName,
+		expirationDate
+	);
 	const transactions = await paymentsRepository.findByCardId(id);
 	const recharges = await rechargeRepository.findByCardId(id);
 	const { balance } = await cardRepository.getStatementBalanceByCardId(id);
@@ -85,7 +114,7 @@ export const getStatementCard = async (cardId: number) => {
 };
 
 const createCardNumber = () => {
-	return faker.finance.creditCardNumber("#### #### #### #### #### ####");
+	return faker.finance.creditCardNumber("#### #### #### ####");
 };
 
 const createCardSecurityCode = () => {

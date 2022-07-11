@@ -9,9 +9,9 @@ const header = "x-api-key";
 const endpoint = "/card";
 
 rechargeRouter.put(
-	"/:cardId/recharge",
-	headerMiddleware(header, `${endpoint}/:cardId/recharge`),
-	validateSchema(rechargeCardSchema, `${endpoint}/:cardId/recharge`),
+	"/recharge",
+	headerMiddleware(header, `${endpoint}/recharge`),
+	validateSchema(rechargeCardSchema, `${endpoint}/recharge`),
 	rechargeController.rechargeCard
 );
 

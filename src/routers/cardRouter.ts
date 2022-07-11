@@ -4,7 +4,8 @@ import headerMiddleware from "../middlewares/headerMiddleware.js";
 import validateSchemaMiddleware from "../middlewares/validateSchemaMiddleware.js";
 import cardRequestSchema from "../schemas/cardRequestSchema.js";
 import activationCardSchema from "../schemas/activationCardSchema.js";
-import blockAndCardSchema from "../schemas/blockAndUnblockCardSchema.js";
+import blockAndUnblockCardSchema from "../schemas/blockAndUnblockCardSchema.js";
+import statementCardSchema from "../schemas/statementCardSchema.js";
 
 const cardRouter = Router();
 
@@ -19,26 +20,27 @@ cardRouter.post(
 );
 
 cardRouter.put(
-	"/:cardId/activate",
-	validateSchemaMiddleware(
-		activationCardSchema,
-		`${endpoint}/:cardId/activate`
-	),
+	"/activate",
+	validateSchemaMiddleware(activationCardSchema, `${endpoint}/activate`),
 	cardController.activateCard
 );
 
 cardRouter.put(
-	"/:cardId/block",
-	validateSchemaMiddleware(blockAndCardSchema, `${endpoint}/:cardId/block`),
+	"/block",
+	validateSchemaMiddleware(blockAndUnblockCardSchema, `${endpoint}/block`),
 	cardController.blockCard
 );
 
 cardRouter.put(
-	"/:cardId/unblock",
-	validateSchemaMiddleware(blockAndCardSchema, `${endpoint}/:cardId/unblock`),
+	"/unblock",
+	validateSchemaMiddleware(blockAndUnblockCardSchema, `${endpoint}/unblock`),
 	cardController.unblockCard
 );
 
-cardRouter.get("/:cardId/statement", cardController.getStatementCard);
+cardRouter.get(
+	"/statement",
+	validateSchemaMiddleware(statementCardSchema, `${endpoint}/statement`),
+	cardController.getStatementCard
+);
 
 export default cardRouter;

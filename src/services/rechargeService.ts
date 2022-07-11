@@ -5,10 +5,23 @@ import AppError from "../config/error.js";
 
 import { RechargeInsertData } from "../types/rechargeTypes";
 
-export const validateCardRecharge = async (cardId: number, apiKey: string) => {
+export const validateCardRecharge = async (
+	number: string,
+	cardholderName: string,
+	expirationDate: string,
+	apiKey: string
+) => {
 	const { id } = await validationService.validateAPIKeyCompany(apiKey);
-	const { expirationDate, password, employeeId } =
-		await validationService.validateCardIdIsRegistered(cardId);
+	const {
+		id: cardId,
+		expirationDate: expirationCardDate,
+		password,
+		employeeId,
+	} = await validationService.validateCardIsRegistered(
+		number,
+		cardholderName,
+		expirationDate
+	);
 	const { companyId } = await validationService.validateEmployee(employeeId);
 	if (companyId !== id) {
 		throw new AppError(
@@ -18,7 +31,7 @@ export const validateCardRecharge = async (cardId: number, apiKey: string) => {
 			"Ensure to provide the correct card ID"
 		);
 	}
-	await validationService.validateCardExpirationDate(expirationDate);
+	await validationService.validateCardExpirationDate(expirationCardDate);
 	if (!password) {
 		throw new AppError(
 			"Card not activated",
@@ -27,6 +40,7 @@ export const validateCardRecharge = async (cardId: number, apiKey: string) => {
 			"Ensure to provide a valid card ID"
 		);
 	}
+	return { cardId };
 };
 
 export const rechargeCardDataPersistence = async (

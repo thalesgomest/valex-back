@@ -12,61 +12,49 @@ export const createCard = async (req: Request, res: Response) => {
 };
 
 export const activateCard = async (req: Request, res: Response) => {
-	const cardId = Number(req.params.cardId);
-	if (!cardId) {
-		throw new AppError(
-			"Card ID is required with route parameter: card/cardId/activate",
-			400,
-			"Card ID is required and must be a number",
-			"Ensure to provide the correct Card ID"
-		);
-	}
-	const { securityCode, password } = res.locals.body;
-	await cardService.activateCard(cardId, securityCode, password);
+	const { number, cardholderName, expirationDate, securityCode, password } =
+		res.locals.body;
+	await cardService.activateCard(
+		number,
+		cardholderName,
+		expirationDate,
+		securityCode,
+		password
+	);
 
 	res.sendStatus(200);
 };
 
 export const blockCard = async (req: Request, res: Response) => {
-	const cardId = Number(req.params.cardId);
-	if (!cardId) {
-		throw new AppError(
-			"Card ID is required with route parameter: card/cardId/block",
-			400,
-			"Card ID is required and must be a number",
-			"Ensure to provide the correct Card ID"
-		);
-	}
-	const { password } = res.locals.body;
-	await cardService.blockCard(cardId, password);
+	const { number, cardholderName, expirationDate, password } =
+		res.locals.body;
+	await cardService.blockCard(
+		number,
+		cardholderName,
+		expirationDate,
+		password
+	);
 	res.sendStatus(200);
 };
 
 export const unblockCard = async (req: Request, res: Response) => {
-	const cardId = Number(req.params.cardId);
-	if (!cardId) {
-		throw new AppError(
-			"Card ID is required with route parameter: card/cardId/unblock",
-			400,
-			"Card ID is required and must be a number",
-			"Ensure to provide the correct Card ID"
-		);
-	}
-	const { password } = res.locals.body;
-	await cardService.unblockCard(cardId, password);
+	const { number, cardholderName, expirationDate, password } =
+		res.locals.body;
+	await cardService.unblockCard(
+		number,
+		cardholderName,
+		expirationDate,
+		password
+	);
 	res.sendStatus(200);
 };
 
 export const getStatementCard = async (req: Request, res: Response) => {
-	const cardId = Number(req.params.cardId);
-	if (!cardId) {
-		throw new AppError(
-			"Card ID is required with route parameter: card/cardId/statement",
-			400,
-			"Card ID is required and must be a number",
-			"Ensure to provide the correct Card ID"
-		);
-	}
-	const cardStatement = await cardService.getStatementCard(cardId);
+	const { number, cardholderName, expirationDate } = res.locals.body;
+	const cardStatement = await cardService.getStatementCard(
+		number,
+		cardholderName,
+		expirationDate
+	);
 	res.status(200).send(cardStatement);
 };

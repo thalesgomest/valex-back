@@ -54,14 +54,22 @@ export const validateUniqueCardByTypeAndEmployee = async (
 	}
 };
 
-export const validateCardIdIsRegistered = async (cardId: number) => {
-	const result = await cardRepository.findById(cardId);
+export const validateCardIsRegistered = async (
+	number: string,
+	cardholderName: string,
+	expirationDate: string
+) => {
+	const result = await cardRepository.findByCardDetails(
+		number,
+		cardholderName,
+		expirationDate
+	);
 	if (!result) {
 		throw new AppError(
 			"Card not found",
 			404,
 			"Card not found with ID",
-			"Ensure to provide the correct ID"
+			"Ensure to provide the correct card details"
 		);
 	}
 	return result;
@@ -83,7 +91,7 @@ const validateCardSecurityCode = async (
 	cvv: string
 ) => {
 	const descryptedSecurityCode = decryptData(encryptedSecurityCode);
-	// CONSOLELOG: console.log(descryptedSecurityCode);
+	CONSOLELOG: console.log(descryptedSecurityCode);
 	if (descryptedSecurityCode !== cvv) {
 		throw new AppError(
 			"Invalid security code",
@@ -95,12 +103,18 @@ const validateCardSecurityCode = async (
 };
 
 export const validateCardForActivation = async (
-	cardId: number,
+	number: string,
+	cardholderName: string,
+	expirationDate: string,
 	cvv: string
 ) => {
-	const { expirationDate, securityCode, password } =
-		await validateCardIdIsRegistered(cardId);
-	await validateCardExpirationDate(expirationDate);
+	const {
+		id,
+		expirationDate: cardExpirationDate,
+		securityCode,
+		password,
+	} = await validateCardIsRegistered(number, cardholderName, expirationDate);
+	await validateCardExpirationDate(cardExpirationDate);
 	if (password) {
 		throw new AppError(
 			"Card already activated",
@@ -110,19 +124,23 @@ export const validateCardForActivation = async (
 		);
 	}
 	await validateCardSecurityCode(securityCode, cvv);
+	return { cardId: id };
 };
 
 export const validateCardForBlockOrUnblock = async (
-	cardId: number,
+	number: string,
+	cardholderName: string,
+	expirationDate: string,
 	password: string,
 	cardService: CardServicesTypes
 ) => {
 	const {
-		expirationDate,
+		id,
+		expirationDate: expirationCardDate,
 		isBlocked,
 		password: registeredCardPassword,
-	} = await validateCardIdIsRegistered(cardId);
-	await validateCardExpirationDate(expirationDate);
+	} = await validateCardIsRegistered(number, cardholderName, expirationDate);
+	await validateCardExpirationDate(expirationCardDate);
 	if (cardService === "blocking" && isBlocked) {
 		throw new AppError(
 			"Card already blocked",
@@ -147,14 +165,19 @@ export const validateCardForBlockOrUnblock = async (
 			"Ensure to provide a correct password"
 		);
 	}
+	return { cardId: id };
 };
 
-export const validateCardRecharge = async (cardId: number, apiKey: string) => {
+export const validateCardRecharge = async (
+	number: string,
+	cardholderName: string,
+	expirationDate: string,
+	apiKey: string
+) => {
 	await validateAPIKeyCompany(apiKey);
-	const { expirationDate, password } = await validateCardIdIsRegistered(
-		cardId
-	);
-	await validateCardExpirationDate(expirationDate);
+	const { expirationDate: expirationCardDate, password } =
+		await validateCardIsRegistered(number, cardholderName, expirationDate);
+	await validateCardExpirationDate(expirationCardDate);
 	if (!password) {
 		throw new AppError(
 			"Card not activated",

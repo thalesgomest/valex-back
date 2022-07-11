@@ -44,14 +44,13 @@ export async function findByCardDetails(
       WHERE number=$1 AND "cardholderName"=$2 AND "expirationDate"=$3`,
 		[number, cardholderName, expirationDate]
 	);
-
 	return result.rows[0];
 }
 
 export async function getStatementBalanceByCardId(cardId: number) {
 	const result = await connection.query(
-		`SELECT (SELECT SUM(amount) FROM recharges WHERE "cardId" = $1) -
-(SELECT SUM(amount) FROM payments WHERE "cardId" = $1) as balance`,
+		`SELECT (SELECT COALESCE(SUM(amount),0) FROM recharges WHERE "cardId" = $1) -
+(SELECT COALESCE(SUM(amount),0) FROM payments WHERE "cardId" = $1) as balance`,
 		[cardId]
 	);
 	return result.rows[0];
