@@ -48,6 +48,15 @@ export async function findByCardDetails(
 	return result.rows[0];
 }
 
+export async function getStatementBalanceByCardId(cardId: number) {
+	const result = await connection.query(
+		`SELECT (SELECT SUM(amount) FROM recharges WHERE "cardId" = $1) -
+(SELECT SUM(amount) FROM payments WHERE "cardId" = $1) as balance`,
+		[cardId]
+	);
+	return result.rows[0];
+}
+
 export async function insert(cardData: CardInsertData) {
 	const {
 		employeeId,

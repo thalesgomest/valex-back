@@ -3,6 +3,8 @@ import { faker } from "@faker-js/faker";
 import * as cardRepository from "../repositories/cardRepository.js";
 import * as companyRepository from "../repositories/companyRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
+import * as paymentsRepository from "../repositories/paymentRepository.js";
+import * as rechargeRepository from "../repositories/rechargeRepository.js";
 
 import { TransactionTypes } from "../types/transactionTypes.js";
 import { CardServicesTypes } from "../types/cardServicesTypes.js";
@@ -63,6 +65,14 @@ export const unblockCard = async (cardId: number, password: string) => {
 		isBlocked: false,
 	};
 	await cardRepository.update(cardId, cardDataUpdate);
+};
+
+export const getStatementCard = async (cardId: number) => {
+	const { id } = await validateCardIdIsRegistered(cardId);
+	const transactions = await paymentsRepository.findByCardId(id);
+	const recharges = await rechargeRepository.findByCardId(id);
+	const { balance } = await cardRepository.getStatementBalanceByCardId(id);
+	return { balance, transactions, recharges };
 };
 
 const validateAPIKeyCompany = async (apiKey: string) => {

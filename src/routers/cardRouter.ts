@@ -39,4 +39,6 @@ cardRouter.put(
 	cardController.unblockCard
 );
 
+cardRouter.get("/:cardId/statement", cardController.getStatementCard);
+
 export default cardRouter;
