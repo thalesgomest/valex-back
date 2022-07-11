@@ -8,7 +8,6 @@ export const createCard = async (req: Request, res: Response) => {
 	const companyAPIKey = res.locals.header;
 	const { employeeId, cardType } = res.locals.body;
 	await cardService.createCard(employeeId, cardType, companyAPIKey);
-
 	res.sendStatus(200);
 };
 

@@ -1,20 +1,16 @@
 import { faker } from "@faker-js/faker";
 
 import * as cardRepository from "../repositories/cardRepository.js";
-import * as companyRepository from "../repositories/companyRepository.js";
-import * as employeeRepository from "../repositories/employeeRepository.js";
 import * as paymentsRepository from "../repositories/paymentRepository.js";
 import * as rechargeRepository from "../repositories/rechargeRepository.js";
 
+import * as validationService from "../services/validationService.js";
+
 import { TransactionTypes } from "../types/transactionTypes.js";
-import { CardServicesTypes } from "../types/cardServicesTypes.js";
 import { CardInsertData, CardUpdateData } from "../types/cardTypes.js";
 
-import {
-	getCardExperationDate,
-	compareDates,
-} from "../utils/cardDateFormatter.js";
-import { encryptData, decryptData } from "../utils/encryptData.js";
+import { getCardExperationDate } from "../utils/cardDateFormatter.js";
+import { encryptData } from "../utils/encryptData.js";
 
 import AppError from "../config/error.js";
 
@@ -23,8 +19,10 @@ export const createCard = async (
 	type: TransactionTypes,
 	apiKey: string
 ) => {
-	const { id } = await validateAPIKeyCompany(apiKey);
-	const { companyId, fullName } = await validateEmployee(employeeId);
+	const { id } = await validationService.validateAPIKeyCompany(apiKey);
+	const { companyId, fullName } = await validationService.validateEmployee(
+		employeeId
+	);
 	if (companyId !== id) {
 		throw new AppError(
 			"Employee unauthorized",
@@ -33,7 +31,10 @@ export const createCard = async (
 			"Ensure to provide the correct employee ID"
 		);
 	}
-	await validateUniqueCardByTypeAndEmployee(type, employeeId);
+	await validationService.validateUniqueCardByTypeAndEmployee(
+		type,
+		employeeId
+	);
 	const cardData = generateCardData(employeeId, fullName, type);
 	await cardRepository.insert(cardData);
 };
@@ -43,7 +44,7 @@ export const activateCard = async (
 	securityCode: string,
 	password: string
 ) => {
-	await validateCardForActivation(cardId, securityCode);
+	await validationService.validateCardForActivation(cardId, securityCode);
 	const cardDataUpdate: CardUpdateData = {
 		isBlocked: false,
 		password: encryptData(password),
@@ -52,7 +53,11 @@ export const activateCard = async (
 };
 
 export const blockCard = async (cardId: number, password: string) => {
-	await validateCardForBlockOrUnblock(cardId, password, "blocking");
+	await validationService.validateCardForBlockOrUnblock(
+		cardId,
+		password,
+		"blocking"
+	);
 	const cardDataUpdate: CardUpdateData = {
 		isBlocked: true,
 	};
@@ -60,7 +65,11 @@ export const blockCard = async (cardId: number, password: string) => {
 };
 
 export const unblockCard = async (cardId: number, password: string) => {
-	await validateCardForBlockOrUnblock(cardId, password, "unblocking");
+	await validationService.validateCardForBlockOrUnblock(
+		cardId,
+		password,
+		"unblocking"
+	);
 	const cardDataUpdate: CardUpdateData = {
 		isBlocked: false,
 	};
@@ -68,55 +77,11 @@ export const unblockCard = async (cardId: number, password: string) => {
 };
 
 export const getStatementCard = async (cardId: number) => {
-	const { id } = await validateCardIdIsRegistered(cardId);
+	const { id } = await validationService.validateCardIdIsRegistered(cardId);
 	const transactions = await paymentsRepository.findByCardId(id);
 	const recharges = await rechargeRepository.findByCardId(id);
 	const { balance } = await cardRepository.getStatementBalanceByCardId(id);
 	return { balance, transactions, recharges };
-};
-
-const validateAPIKeyCompany = async (apiKey: string) => {
-	const result = await companyRepository.findByApiKey(apiKey);
-	if (!result) {
-		throw new AppError(
-			"Company not found",
-			404,
-			"Company not found with API key",
-			"Ensure to provide the correct API key"
-		);
-	}
-	return result;
-};
-
-const validateEmployee = async (employeeId: number) => {
-	const result = await employeeRepository.findById(employeeId);
-	if (!result) {
-		throw new AppError(
-			"Employee not found",
-			404,
-			"Employee not found with ID",
-			"Ensure to provide the correct ID"
-		);
-	}
-	return result;
-};
-
-const validateUniqueCardByTypeAndEmployee = async (
-	type: TransactionTypes,
-	employeeId: number
-) => {
-	const result = await cardRepository.findByTypeAndEmployeeId(
-		type,
-		employeeId
-	);
-	if (result) {
-		throw new AppError(
-			"Card already exists",
-			409,
-			"Card already exists for this employee",
-			"Ensure to provide a unique card type"
-		);
-	}
 };
 
 const createCardNumber = () => {
@@ -176,96 +141,4 @@ const generateCardData = (
 		isBlocked: true,
 		type,
 	};
-};
-
-const validateCardIdIsRegistered = async (cardId: number) => {
-	const result = await cardRepository.findById(cardId);
-	if (!result) {
-		throw new AppError(
-			"Card not found",
-			404,
-			"Card not found with ID",
-			"Ensure to provide the correct ID"
-		);
-	}
-	return result;
-};
-
-const validateCardExpirationDate = async (expirationDate: string) => {
-	if (compareDates(new Date(), expirationDate) === "after") {
-		throw new AppError(
-			"Card expired",
-			409,
-			"This card has expired",
-			"Ensure to provide a valid card ID"
-		);
-	}
-};
-
-const validateCardSecurityCode = async (
-	encryptedSecurityCode: string,
-	cvv: string
-) => {
-	const descryptedSecurityCode = decryptData(encryptedSecurityCode);
-	// CONSOLELOG: console.log(descryptedSecurityCode);
-	if (descryptedSecurityCode !== cvv) {
-		throw new AppError(
-			"Invalid security code",
-			409,
-			"Invalid security code",
-			"Ensure to provide a correct security code"
-		);
-	}
-};
-
-const validateCardForActivation = async (cardId: number, cvv: string) => {
-	const { expirationDate, securityCode, password } =
-		await validateCardIdIsRegistered(cardId);
-	await validateCardExpirationDate(expirationDate);
-	if (password) {
-		throw new AppError(
-			"Card already activated",
-			409,
-			"This card is already activated",
-			"Ensure to provide a valid card ID"
-		);
-	}
-	await validateCardSecurityCode(securityCode, cvv);
-};
-
-const validateCardForBlockOrUnblock = async (
-	cardId: number,
-	password: string,
-	cardService: CardServicesTypes
-) => {
-	const {
-		expirationDate,
-		isBlocked,
-		password: registeredCardPassword,
-	} = await validateCardIdIsRegistered(cardId);
-	await validateCardExpirationDate(expirationDate);
-	if (cardService === "blocking" && isBlocked) {
-		throw new AppError(
-			"Card already blocked",
-			409,
-			"This card is already blocked",
-			"Ensure to provide a valid card ID"
-		);
-	}
-	if (cardService === "unblocking" && !isBlocked) {
-		throw new AppError(
-			"Card already unblocked",
-			409,
-			"This card is already unblocked",
-			"Ensure to provide a valid card ID"
-		);
-	}
-	if (password !== decryptData(registeredCardPassword)) {
-		throw new AppError(
-			"Invalid password",
-			409,
-			"Invalid password",
-			"Ensure to provide a correct password"
-		);
-	}
 };
