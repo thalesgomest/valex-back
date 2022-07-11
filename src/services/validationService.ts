@@ -91,7 +91,6 @@ const validateCardSecurityCode = async (
 	cvv: string
 ) => {
 	const descryptedSecurityCode = decryptData(encryptedSecurityCode);
-	// CONSOLELOG: console.log(descryptedSecurityCode);
 	if (descryptedSecurityCode !== cvv) {
 		throw new AppError(
 			"Invalid security code",
