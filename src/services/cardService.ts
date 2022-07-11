@@ -10,7 +10,7 @@ import { TransactionTypes } from "../types/transactionTypes.js";
 import { CardInsertData, CardUpdateData } from "../types/cardTypes.js";
 
 import { getCardExperationDate } from "../utils/cardDateFormatter.js";
-import { encryptData } from "../utils/encryptData.js";
+import { encryptData, decryptData } from "../utils/encryptData.js";
 
 import AppError from "../config/error.js";
 
@@ -37,6 +37,9 @@ export const createCard = async (
 	);
 	const cardData = generateCardData(employeeId, fullName, type);
 	await cardRepository.insert(cardData);
+	const { securityCode } = cardData;
+	const decryptedSecurityCode = decryptData(securityCode);
+	return { cvv: decryptedSecurityCode };
 };
 
 export const activateCard = async (
