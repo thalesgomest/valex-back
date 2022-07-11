@@ -68,7 +68,7 @@ export const validateCardIsRegistered = async (
 		throw new AppError(
 			"Card not found",
 			404,
-			"Card not found with ID",
+			"Card not found with details",
 			"Ensure to provide the correct card details"
 		);
 	}
@@ -91,7 +91,7 @@ const validateCardSecurityCode = async (
 	cvv: string
 ) => {
 	const descryptedSecurityCode = decryptData(encryptedSecurityCode);
-	CONSOLELOG: console.log(descryptedSecurityCode);
+	// CONSOLELOG: console.log(descryptedSecurityCode);
 	if (descryptedSecurityCode !== cvv) {
 		throw new AppError(
 			"Invalid security code",

@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 
 import * as cardService from "../services/cardService.js";
 
-import AppError from "../config/error.js";
-
 export const createCard = async (req: Request, res: Response) => {
 	const companyAPIKey = res.locals.header;
 	const { employeeId, cardType } = res.locals.body;

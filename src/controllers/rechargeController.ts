@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 
 import * as rechargeService from "../services/rechargeService.js";
 
-import AppError from "../config/error.js";
-
 export const rechargeCard = async (req: Request, res: Response) => {
 	const companyAPIKey = res.locals.header;
 	const { number, cardholderName, expirationDate, amount } = res.locals.body;
