@@ -37,9 +37,14 @@ export const createCard = async (
 	);
 	const cardData = generateCardData(employeeId, fullName, type);
 	await cardRepository.insert(cardData);
-	const { securityCode, number } = cardData;
+	const { number, cardholderName, securityCode, expirationDate } = cardData;
 	const decryptedSecurityCode = decryptData(securityCode);
-	return { cvv: decryptedSecurityCode, cardNumber: number };
+	return {
+		number,
+		cardholderName,
+		expirationDate,
+		securityCode: decryptedSecurityCode,
+	};
 };
 
 export const activateCard = async (

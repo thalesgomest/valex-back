@@ -5,12 +5,12 @@ import * as cardService from "../services/cardService.js";
 export const createCard = async (req: Request, res: Response) => {
 	const companyAPIKey = res.locals.header;
 	const { employeeId, cardType } = res.locals.body;
-	const { cvv, cardNumber } = await cardService.createCard(
+	const cardDataResponse = await cardService.createCard(
 		employeeId,
 		cardType,
 		companyAPIKey
 	);
-	res.status(200).send({ cvv, cardNumber });
+	res.status(200).send(cardDataResponse);
 };
 
 export const activateCard = async (req: Request, res: Response) => {
