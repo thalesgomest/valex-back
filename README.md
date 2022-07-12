@@ -23,6 +23,7 @@
 
 ## Table of contents
 * [Project Description](#project-description)
+* [Usage](#usage)
 * [Author](#author)
 
 
@@ -34,6 +35,116 @@
 ## Status
 <!-- ![status-finished](https://user-images.githubusercontent.com/97575616/152926720-d042178b-24c0-4d6b-94fb-0ccbd3c082cc.svg) -->
 ![status-in-progress](https://user-images.githubusercontent.com/97575616/153774620-d6a0a615-9d38-4402-ae72-20c52f8bbd5c.svg)
+
+## Usage
+
+```bash
+$ git clone https://github.com/thalesgomest/valex-back.git
+
+$ cd valex-back
+
+$ npm install
+
+$ npm run dev
+```
+
+API:
+
+```css
+
+POST /card/create
+    • Route to create a new card
+    • headers: {
+		"x-api-key": "adKLNx.DzvOVjQH01TumGl2urPjPQSxUbf67vs0"	
+	}
+    • body: {
+		"employeeId": 2, 
+		"cardType": "groceries"
+    }
+    • response: {
+		"cvv": "559",
+		"cardNumber": "8821 6003 5277 9524"
+    }
+	
+► Use the data of this response for test other endpoints
+
+```
+
+```css
+
+PUT /card/activate
+    • Route to active a card
+    • body: {
+		"number": "9877 8641 4181 0418",
+		"cardholderName": "CICLANA M MADEIRA",
+		"expirationDate": "07/27",
+		"securityCode": "761",
+		"password": "0402" 
+    }
+```
+```css
+
+PUT /card/block
+    • Route to block a card
+    • body: {
+		"number": "9877 8641 4181 0418",
+		"cardholderName": "CICLANA M MADEIRA",
+		"expirationDate": "07/27",
+		"password": "0402" 
+    }
+```
+```css
+
+PUT /card/unblock
+    • Route to unblock a card
+    • body: {
+		"number": "9877 8641 4181 0418",
+		"cardholderName": "CICLANA M MADEIRA",
+		"expirationDate": "07/27",
+		"password": "0402" 
+    }
+```
+
+```css
+
+GET /card/statement
+    • Route to get card's statement
+    • body: {
+		"number": "9877 8641 4181 0418",
+		"cardholderName": "CICLANA M MADEIRA",
+		"expirationDate": "07/27"
+    }
+	
+```
+```css
+
+POST /card/recharge
+    • Route to get do a card recharge
+	• headers: {
+		"x-api-key": "adKLNx.DzvOVjQH01TumGl2urPjPQSxUbf67vs0"	
+	}
+    • body: {
+		"number": "9877 8641 4181 0418",
+		"cardholderName": "CICLANA M MADEIRA",
+		"expirationDate": "07/27",
+		"amount": 1500.99
+    }
+	
+```
+```css
+
+POST /card/payment/:businessId
+	
+    • Route to do a payment with a card in a POS (Point of Sale)
+    • body: {
+		"number": "9877 8641 4181 0418",
+		"cardholderName": "CICLANA M MADEIRA",
+		"expirationDate": "07/27",
+		"password": "0402",
+		"amount": 1499.99
+    }
+	
+```
 
 ### Author
 ---
