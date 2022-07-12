@@ -62,13 +62,14 @@ POST /card/create
 		"cardType": "groceries"
     }
     • response: {
-		"cvv": "559",
-		"cardNumber": "8821 6003 5277 9524"
+		"number": "4747 7552 7052 6823",
+		"cardholderName": "CICLANA M MADEIRA",
+		"expirationDate": "07/27",
+		"securityCode": "398"
     }
-	
-► Use the data of this response for test other endpoints
 
 ```
+⚠️ __*Use the response data of the route /card/create for test the below endpoints*__
 
 ```css
 
