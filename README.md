@@ -11,7 +11,7 @@
 
 ## 📌 Project Description
 
-<p align="justify">This is a benefit card API. The API is responsible for creating, reloading, activating, as well as processing purchases.
+<p align="justify">This is a benefit card API. The API is responsible for creating, reloading, activating, as well as processing all purchases of the card.
 </p>
 
 ## 🚧 Status of work
