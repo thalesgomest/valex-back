@@ -86,7 +86,7 @@ POST /card/create
 
 | Body             | Type     | Description                         |
 | :--------------- | :------- | :---------------------------------- |
-| `number`         | `string` | **Required**. → card number         |
+| `number`         | `string` | **Required** → card number         |
 | `cardholderName` | `string` | **Required** → cardholder name      |
 | `expirationDate` | `string` | **Required** → card expiration date |
 | `securityCode`   | `string` | **Required** → card securityCode    |
@@ -102,7 +102,7 @@ PUT /card/block
 
 | Body             | Type     | Description                         |
 | :--------------- | :------- | :---------------------------------- |
-| `number`         | `string` | **Required**. → card number         |
+| `number`         | `string` | **Required** → card number         |
 | `cardholderName` | `string` | **Required** → cardholder name      |
 | `expirationDate` | `string` | **Required** → card expiration date |
 | `password`       | `string` | **Required** → card password        |
@@ -117,7 +117,7 @@ PUT /card/unblock
 
 | Body             | Type     | Description                         |
 | :--------------- | :------- | :---------------------------------- |
-| `number`         | `string` | **Required**. → card number         |
+| `number`         | `string` | **Required** → card number         |
 | `cardholderName` | `string` | **Required** → cardholder name      |
 | `expirationDate` | `string` | **Required** → card expiration date |
 | `password`       | `string` | **Required** → card password        |
@@ -132,7 +132,7 @@ GET /card/statement
 
 | Body             | Type     | Description                         |
 | :--------------- | :------- | :---------------------------------- |
-| `number`         | `string` | **Required**. → card number         |
+| `number`         | `string` | **Required** → card number         |
 | `cardholderName` | `string` | **Required** → cardholder name      |
 | `expirationDate` | `string` | **Required** → card expiration date |
 
@@ -150,7 +150,7 @@ POST /card/recharge
 
 | Body             | Type     | Description                         |
 | :--------------- | :------- | :---------------------------------- |
-| `number`         | `string` | **Required**. → card number         |
+| `number`         | `string` | **Required** → card number         |
 | `cardholderName` | `string` | **Required** → cardholder name      |
 | `expirationDate` | `string` | **Required** → card expiration date |
 | `amount`         | `number` | **Required** → recharge amount      |
@@ -165,7 +165,7 @@ POST /card/payment/:businessId
 
 | Body             | Type     | Description                         |
 | :--------------- | :------- | :---------------------------------- |
-| `number`         | `string` | **Required**. → card number         |
+| `number`         | `string` | **Required** → card number         |
 | `cardholderName` | `string` | **Required** → cardholder name      |
 | `expirationDate` | `string` | **Required** → card expiration date |
 | `password`       | `string` | **Required** → card password        |
